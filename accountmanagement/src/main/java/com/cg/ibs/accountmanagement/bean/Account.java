@@ -23,13 +23,12 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "Account")
 @NamedQueries({
-	@NamedQuery(name="ACC_BY_UCI",query="Select a from Account a INNER JOIN a.accountHoldings h where h.customer.uci= :UCI"),
-	@NamedQuery(name="MAX_ACC_NUMBER", query="select max(a.accNo) from Account a")
+	@NamedQuery(name="ACC_BY_UCI",query="Select a from Account a INNER JOIN a.accountHoldings h where h.customer.uci= :UCI")
 })
 public class Account implements Serializable {
 	@Id
-//	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACC_SQ")
-//    @SequenceGenerator(sequenceName = "ACCOUNT_SEQUENCE", allocationSize = 1, name = "ACC_SQ", initialValue = 1000000001 )
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ACC_SQ")
+	@SequenceGenerator(sequenceName = "ACCOUNT_SEQUENCE", allocationSize = 1, name = "ACC_SQ" )
 	@Column(name = "account_number", nullable = false, length = 11)
 	private BigInteger accNo;
 	@Column(name = "balance", nullable = false, length = 20)

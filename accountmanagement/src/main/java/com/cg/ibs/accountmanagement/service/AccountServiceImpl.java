@@ -59,15 +59,15 @@ public class AccountServiceImpl implements AccountService {
 	public Account addAccount(Customer customerBean,BigInteger accNo, AccountType accType, double amt, double tenure) throws IBSException {
 		entityTransaction= DBUtil.getTransaction();
 		double maturity_amt = 0;
-		BigInteger accountNumber;
+//		BigInteger accountNumber;
 		Account accountBean=null;
 		Account accountBean2 = accountDao.getAccountByAccNo(accNo);
 		if(amt>0) {
 		AccountHolding accountHoldingBean = new AccountHolding();
 		
 		accountBean = new Account();
-		accountNumber= accountDao.getAccNo();
-		accountBean.setAccNo(accountNumber);
+//		accountNumber= accountDao.getAccNo();
+//		accountBean.setAccNo(accountNumber);
 		accountBean.setAccCreationDate(LocalDate.now());
 		accountBean.setAccStatus(AccountStatus.ACTIVE);
 		accountBean.setAccType(accType);

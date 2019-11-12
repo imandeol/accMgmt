@@ -75,6 +75,8 @@ public class AccountUi {
 				String password = null;
 				boolean bool1;
 				Account account = new Account();
+				List<TransactionBean> txns;
+				int length;
 				Customer customerBean = new Customer();
 				do {
 					bool1 = false;
@@ -94,6 +96,16 @@ public class AccountUi {
 								for (CustomerMenu menu : CustomerMenu.values()) {
 									System.out.println((menu.ordinal() + 1) + "." + menu.toString().replace("_", " "));
 								}
+								
+								for(Account accounts:accountsList) {
+								txns = transactionService
+										.getMiniStmt(accounts.getAccNo());
+								length = txns.size();
+								if (length == 0) {
+									txns.add(transactionService.openingAccountTransaction(accounts));
+								}
+								}
+								
 								while (!scanner.hasNextInt()) {
 									System.out.println("Enter a valid number!");
 									scanner.next();
@@ -131,10 +143,10 @@ public class AccountUi {
 										do {
 											accountsList = accountService.getAccounts(customerBean.getUci());
 											account = selectAccount(accountsList);
-											List<TransactionBean> txns = transactionService
+											txns = transactionService
 													.getMiniStmt(account.getAccNo());
 											List<TransactionBean> txns_sub;
-											int length = txns.size();
+											length = txns.size();
 											if (length == 0) {
 												txns.add(transactionService.openingAccountTransaction(account));
 											}
@@ -444,6 +456,7 @@ public class AccountUi {
 					} catch (Exception excp) {
 						// System.out.println("Invalid userId/password ");
 						System.out.println(excp.getMessage());
+//						excp.printStackTrace();
 						bool1 = true;
 					}
 				} while (bool1);
@@ -574,7 +587,7 @@ public class AccountUi {
 									case FUNDS_DEPOSIT_ENTRY:
 										BigDecimal amt = new BigDecimal(0);
 										boolean flag3 = false;
-										BigDecimal balance = new BigDecimal(0);
+//										BigDecimal balance = new BigDecimal(0);
 										do {
 											flag3 = false;
 											try {
@@ -764,6 +777,8 @@ public class AccountUi {
 		Double InvestAmt=0.0;
 		Account account;
 		BigInteger accountNum;
+		String tranPwd, accountTransacPwd;
+		int transInput;
 		System.out.println("Select an account you want to open:");
 		for (AccountMenu menu : AccountMenu.values()) {
 			System.out.println((menu.ordinal() + 1) + "." + menu.toString().replace("_", " "));
@@ -829,6 +844,7 @@ public class AccountUi {
 						fdTenure = scanner.nextDouble();
 					}
 
+					
 					createdAccount = accountService.addAccount(customerBean, accountNum, AccountType.FIXED_DEPOSIT,
 							InvestAmt, fdTenure);
 					System.out.println("FD Successfully created with total amount after tenure:"
@@ -844,6 +860,7 @@ public class AccountUi {
 			break;
 		case 2:
 			account = selectAccountSaving(accountsList);
+			accountTransacPwd= account.getTrans_Pwd();
 			if (account.getAccStatus().equals(AccountStatus.ACTIVE)) {
 				accountNum = account.getAccNo();
 				try {
@@ -878,10 +895,33 @@ public class AccountUi {
 					}
 
 					double rdTenure = scanner.nextDouble();
+					
 					while(rdTenure>10 || rdTenure<=0) {
 						System.out.println("Enter RD Tenure in years max(10 years)");
+						while (!scanner.hasNextDouble()) {
+							System.out.println("Enter a valid Tenure!");
+							scanner.next();
+							scanner.nextLine();
+						}
 						rdTenure = scanner.nextDouble();
 					}
+					
+					System.out.println("Enter transaction password");
+
+					tranPwd = scanner.next();
+
+					transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
+
+					while (transInput == 2) {
+						System.out.println("Enter transaction password");
+
+						tranPwd = scanner.next();
+
+						transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
+
+					}
+
+					
 					createdAccount = accountService.addAccount(customerBean, account.getAccNo(),
 							AccountType.RECURRING_DEPOSIT, InvestAmt, rdTenure);
 					System.out.println("RD Successfully created with total amount after tenure:"
@@ -1014,15 +1054,15 @@ public class AccountUi {
 					System.out.println("Enter proper amount again");
 					amt = scanner.nextBigDecimal();
 				}
-
-				System.out.println("enter transaction password");
+				
+				System.out.println("Enter transaction password");
 
 				String tranPwd = scanner.next();
 
 				transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
 
 				while (transInput == 2) {
-					System.out.println("enter transaction password");
+					System.out.println("Enter transaction password");
 
 					tranPwd = scanner.next();
 
@@ -1085,14 +1125,14 @@ public class AccountUi {
 					amt = scanner.nextBigDecimal();
 				}
 
-				System.out.println("enter transaction password");
+				System.out.println("Enter transaction password");
 
 				String tranPwd = scanner.next();
 
 				transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
 
 				while (transInput == 2) {
-					System.out.println("enter transaction password");
+					System.out.println("Enter transaction password");
 
 					tranPwd = scanner.next();
 					

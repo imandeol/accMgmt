@@ -74,16 +74,16 @@ public class AccountDaoImpl implements AccountDao {
 		return result;
 	}
 	
-	@Override
-	public BigInteger getAccNo() {
-		BigInteger accNumber= null;
-		try {
-		TypedQuery<BigInteger> query= entityManager.createNamedQuery("MAX_ACC_NUMBER", BigInteger.class);
-			accNumber= query.getSingleResult();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return accNumber.add(BigInteger.valueOf(1));
-		
-	}
+//	@Override
+//	public BigInteger getAccNo() {
+//		BigInteger accNumber= null;
+//		try {
+//		TypedQuery<BigInteger> query= entityManager.createNamedQuery("MAX_ACC_NUMBER", BigInteger.class);
+//			accNumber= query.getSingleResult();
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
+//		return accNumber.add(BigInteger.valueOf(1));
+//		
+//	}
 }

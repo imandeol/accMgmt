@@ -12,5 +12,5 @@ public interface AccountDao {
 	public List<Account> getAccountsByUCI(BigInteger UCI);
 	public Account getAccountByAccNo(BigInteger accNumber) throws IBSException;
 	public boolean checkAccountExists(BigInteger accNo);
-	public BigInteger getAccNo();
+//	public BigInteger getAccNo();
 }
