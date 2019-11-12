@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.cg.ibs.accountmanagement.bean.Account;
 import com.cg.ibs.accountmanagement.bean.ServiceProvider;
 import com.cg.ibs.accountmanagement.bean.TransactionBean;
 import com.cg.ibs.accountmanagement.exception.IBSException;
@@ -17,4 +18,5 @@ public interface TransactionService {
 	public BigDecimal payUtilityBill(BigInteger accNo, BigInteger recipientNo, String transacPass, BigDecimal amount) throws IBSException;
 	public int fundsDeposit(BigInteger accNo, BigDecimal amt, BigInteger transferAccount,int transId) throws IBSException;
 	public BigDecimal TransferFundsOtherBank(BigInteger accNo, BigDecimal amt, String tranPwd, BigInteger recipientNo, String otherBank) throws IBSException;
+	public TransactionBean openingAccountTransaction(Account account) throws IBSException;
 }

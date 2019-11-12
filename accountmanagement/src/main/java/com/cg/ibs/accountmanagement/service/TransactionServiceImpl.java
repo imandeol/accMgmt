@@ -162,6 +162,37 @@ public class TransactionServiceImpl implements TransactionService {
 		return accountBean.getBalance();
 	}
 	
+	@Override
+	public TransactionBean openingAccountTransaction(Account account) throws IBSException {
+		entityTransaction= DBUtil.getTransaction(); 
+//		Account accountBean = accountDao.getAccountByAccNo(accNo);
+		TransactionBean tranBean = new TransactionBean();
+		if (account != null && account.getAccStatus().equals(AccountStatus.ACTIVE)) {
+//			account.setBalance(account.getBalance().add(amt));
+			tranBean.setAccount(account);
+			tranBean.setTransactionAmount(account.getBalance());
+			tranBean.setTransactionDate(account.getAccCreationDate().atTime(12,30));
+			tranBean.setTransactionType(TransactionType.CREDIT);
+			tranBean.setTransactionMode(TransactionMode.CASH);
+			tranBean.setTransactionDescription("Account Opening" );
+			tranBean.setReferenceId("Account Opening on "+ account.getAccCreationDate().toString());
+
+			if(!entityTransaction.isActive()) {
+				entityTransaction.begin();
+				}
+				
+			accountDao.update(account);
+			transactionDao.addNewTransaction(tranBean);
+			entityTransaction.commit();
+		}
+		else {
+			logger.error(IBSExceptionInt.INVALID_ACC_NO);
+			throw new IBSException(IBSExceptionInt.INVALID_ACC_NO);
+		}
+		return tranBean;
+
+	}
+	
 	
 	@Override
 	public int fundsDeposit(BigInteger accNo, BigDecimal amt, BigInteger transferAccount,int transId) throws IBSException {

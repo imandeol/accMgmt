@@ -136,8 +136,8 @@ public class AccountUi {
 											List<TransactionBean> txns_sub;
 											int length = txns.size();
 											if (length == 0) {
-												System.out.println("No transactions are done yet!!!");
-											} else {
+												txns.add(transactionService.openingAccountTransaction(account));
+											}
 												System.out.println(
 														"-------------------------------------------------------------------------------------------------------------------------------------");
 												System.out.printf("%10s %25s %20s %35s %30s", "SERIAL NO",
@@ -171,7 +171,7 @@ public class AccountUi {
 												}
 												System.out.println(
 														"-------------------------------------------------------------------------------------------------------------------------------------");
-											}
+											
 											System.out.println(
 													"Do you want to continue to view mini statements?Press Y/y to continue and anything else to go back to main menu");
 											check = scanner.next().charAt(0);
@@ -316,17 +316,17 @@ public class AccountUi {
 													"-----------------------------------------------------------------------------------------------------------------------------------------------------------");
 										} else {
 											System.out.println(
-													"-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+													"---------------------------------------------------------------------------------------------------");
 											System.out.printf("%10s %25s %20s %25s", "ACCOUNT NUMBER", "BALANCE",
 													"ACCOUNT TYPE", "ACCOUNT STATUS");
 											System.out.println();
 											System.out.println(
-													"-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+													"---------------------------------------------------------------------------------------------------");
 											System.out.format("%10s %25s %20s %25s", printAccountNumber(account.getAccNo()),
 													account.getBalance(), account.getAccType(), account.getAccStatus());
 											System.out.println();
 											System.out.println(
-													"-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+													"---------------------------------------------------------------------------------------------------");
 
 										}
 										System.out.println(
@@ -338,7 +338,8 @@ public class AccountUi {
 										do {
 										accountsList = accountService.getAccounts(customerBean.getUci());
 										account = selectInvestmentAccount(accountsList);
-
+										if(account.getAccStatus().equals(AccountStatus.CLOSED))
+											break;
 										System.out.println(
 												"Select the Account where Maturity Amount is to be Credited:  ");
 										Account closingAccount = selectAccountSaving(accountsList);
@@ -361,6 +362,10 @@ public class AccountUi {
 												ServiceProvider serviceProvider1 = new ServiceProvider();
 												List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
 												providers = transactionService.getServiceProviders();
+												if(providers.isEmpty()) {
+													System.out.println("Bill Payment Portal is down! Returning to Main Menu!");
+													break;
+												}
 												int inc = 1;
 												System.out.println(
 														"-----------------------------------------------------------------------------------------");
@@ -404,6 +409,7 @@ public class AccountUi {
 													BigDecimal amount = scanner.nextBigDecimal();
 													System.out.println("Enter transaction password");
 													String transacPass = scanner.next();
+													checkTransactionPassword(transacPass, account.getTrans_Pwd());
 													transactionService.payUtilityBill(account.getAccNo(),
 															serviceProvider1.getAccountNumber(), transacPass, amount);
 													System.out.println("Payment done successfully");
