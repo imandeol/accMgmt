@@ -203,12 +203,14 @@ public class AccountUi {
 															.ofPattern("dd/MM/yyyy-HH:mm:ss");
 													System.out.println("Enter start date in dd/MM/YYYY format");
 													String startDate = scanner.next();
-
 													startDate = startDate + "-00:00:00";
 													// scanner.nextLine();
 													// System.out.println(startDate);
-
 													startDate1 = LocalDateTime.parse(startDate, formatter);
+													if(startDate1.compareTo(LocalDateTime.now())>0) {
+														System.out.println("Invalid Start date");
+														flag=true;
+													}
 												} catch (Exception excp) {
 													System.out.println("invalid start date");
 													flag = true;
@@ -238,34 +240,42 @@ public class AccountUi {
 															.println("No transactions are done during this period!!!");
 												} else {
 
+													System.out.println("----IBS BANK----\n");
+													System.out.println(" Periodic Statement of Customer: "
+															+ customerBean.getFirstName() + " "
+															+ customerBean.getLastname() + " between period "
+															+ startDate1.toLocalDate() + " and  "
+															+ endDate1.toLocalDate() + ":\n");
+
 													System.out.println(
-															"-------------------------------------------------------------------------------------------------------------------------------------");
-													System.out.printf("%10s %25s %20s %25s %30s", "TRANSACTION ID",
-															"TRANSACTION TYPE", "TRANSACTION DATE",
-															"TRANSACTION AMOUNT", "TRANSACTION MODE");
+															"-------------------------------------------------------------------------------------------------------------------------------------------------------");
+													System.out.printf("%25s %25s %30s %15s %20s %20s",
+															"TRANSACTION DATE", "DESCRIPTION", "TRANSACTION_ID",
+															"REF ID", "WITHDRAWLS", "DEPOSITS");
 													System.out.println();
 													System.out.println(
-															"-------------------------------------------------------------------------------------------------------------------------------------");
+															"------------------------------------------------------------------------------------------------------------------------------------------------------");
 													for (TransactionBean a : txns1) {
 														BigDecimal amount = a.getTransactionAmount();
 														amount = amount.setScale(2, BigDecimal.ROUND_HALF_UP);
 														if (a.getTransactionType().equals(TransactionType.CREDIT)) {
-															System.out.format("%10s %15s %35s %25s %30s",
-																	(txns1.indexOf(a) + 1), a.getTransactionType(),
+															System.out.format("%25s %40s %10s %20s %20s %20s",
 																	customFormat.format(a.getTransactionDate()),
-																	"+" + amount, a.getTransactionMode());
+																	a.getTransactionDescription(), a.getTransactionId(),
+																	a.getReferenceId(), "-", amount);
 															System.out.println();
 														} else {
-															System.out.format("%10s %15s %35s %25s %30s",
-																	(txns1.indexOf(a) + 1), a.getTransactionType(),
+															System.out.format("%25s %40s %10s %20s %20s %20s",
 																	customFormat.format(a.getTransactionDate()),
-																	"-" + amount, a.getTransactionMode());
+																	a.getTransactionDescription(), a.getTransactionId(),
+																	a.getReferenceId(), amount, "-");
 															System.out.println();
 
 														}
 													}
 													System.out.println(
-															"-------------------------------------------------------------------------------------------------------------------------------------");
+															"----------------------------------------------------------------------------------------------------------------------------------------------------");
+								System.out.println("Current Balance in INR is: "+account.getBalance().doubleValue());
 												}
 											} catch (Exception excp) {
 												System.out.println(excp.getMessage());
