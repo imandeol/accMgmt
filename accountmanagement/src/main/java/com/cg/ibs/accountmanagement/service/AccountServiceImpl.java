@@ -252,7 +252,7 @@ public class AccountServiceImpl implements AccountService {
 		double principal = accountBean.getBalance().doubleValue();
 		double rate = 6;
 		if (totalMonths < 3) {
-			balanceAmt = (principal + (principal * (totalMonths * (int) rate) / 1200));
+			balanceAmt = (principal + (principal * (totalMonths * (int) rate) / 1200))- (0.01 * principal);
 		} else {
 			double ratePercent = (1 + (rate / totalMonths) / 100);
 			ratePercent = Math.pow(ratePercent, totalMonths);

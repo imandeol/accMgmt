@@ -379,6 +379,7 @@ public class AccountUi {
 										break;
 									case PAY_UTILITY_BILLS:
 										char c;
+										int transInput;
 										do {
 											try {
 												ServiceProvider serviceProvider1 = new ServiceProvider();
@@ -429,13 +430,24 @@ public class AccountUi {
 														scanner.nextLine();
 													}
 													BigDecimal amount = scanner.nextBigDecimal();
+													
 													System.out.println("Enter transaction password");
 													String transacPass = scanner.next();
-													checkTransactionPassword(transacPass, account.getTrans_Pwd());
+													transInput=checkTransactionPassword(transacPass, account.getTrans_Pwd());
+													while (transInput == 2) {
+														System.out.println("Enter transaction password");
+
+														transacPass = scanner.next();
+
+														transInput = checkTransactionPassword(transacPass,account.getTrans_Pwd());
+
+													}
+													if(transInput==1) {
 													transactionService.payUtilityBill(account.getAccNo(),
 															serviceProvider1.getAccountNumber(), transacPass, amount);
 													System.out.println("Payment done successfully");
-												} else {
+													}
+													} else {
 													System.out.println(
 															"Savings Account selected is closed, cannot perform any further transaction!!");
 												}
@@ -819,6 +831,7 @@ public class AccountUi {
 			account = selectAccountSaving(accountsList);
 			if (account.getAccStatus().equals(AccountStatus.ACTIVE)) {
 				accountNum = account.getAccNo();
+				accountTransacPwd= account.getTrans_Pwd();
 				try {
 					System.out.println("Enter FDInvestment Amount");
 					while (!scanner.hasNextDouble()) {
@@ -854,12 +867,26 @@ public class AccountUi {
 						fdTenure = scanner.nextDouble();
 					}
 
-					
+					System.out.println("Enter transaction password");
+
+					tranPwd = scanner.next();
+
+					transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
+
+					while (transInput == 2) {
+						System.out.println("Enter transaction password");
+
+						tranPwd = scanner.next();
+
+						transInput = checkTransactionPassword(tranPwd, accountTransacPwd);
+
+					}
+					if(transInput==1) {
 					createdAccount = accountService.addAccount(customerBean, accountNum, AccountType.FIXED_DEPOSIT,
 							InvestAmt, fdTenure);
 					System.out.println("FD Successfully created with total amount after tenure:"
 							+ df.format(createdAccount.getMaturityAmt()));
-					result = true;
+					result = true;}
 				} catch (IBSException excp) {
 					System.out.println(excp.getMessage());
 				} catch (InputMismatchException mismatchException) {
@@ -870,9 +897,10 @@ public class AccountUi {
 			break;
 		case 2:
 			account = selectAccountSaving(accountsList);
-			accountTransacPwd= account.getTrans_Pwd();
+			
 			if (account.getAccStatus().equals(AccountStatus.ACTIVE)) {
 				accountNum = account.getAccNo();
+				accountTransacPwd= account.getTrans_Pwd();
 				try {
 					System.out.println("Enter RD Ivestment Amount");
 
@@ -931,12 +959,12 @@ public class AccountUi {
 
 					}
 
-					
+					if(transInput==1) {
 					createdAccount = accountService.addAccount(customerBean, account.getAccNo(),
 							AccountType.RECURRING_DEPOSIT, InvestAmt, rdTenure);
 					System.out.println("RD Successfully created with total amount after tenure:"
 							+ df.format(createdAccount.getMaturityAmt()));
-					result = true;
+					result = true;}
 				} catch (IBSException excp) {
 					System.out.println(excp.getMessage());
 				} catch (InputMismatchException excp) {
@@ -958,6 +986,9 @@ public class AccountUi {
 		double years=noOfDaysBetween/365.0;
 		double tenure=closingAccountBean.getTenure();
 		double invAmt=closingAccountBean.getOpenBalance().doubleValue();
+		String tranPwd; 
+		String accTransPwd= creditAccountBean.getTrans_Pwd();
+		int transInput;
 		if(tenure>years) {
 			System.out.println("Penality Amount will be deducted as tenure is not completed yet.(Penalty= Rs " +(0.01* invAmt) + ") Do you want to continue? Y/y?");
 			ch=scanner.next().charAt(0);
@@ -965,7 +996,21 @@ public class AccountUi {
 		if(ch=='y'||ch=='Y') {
 		//Penalty to be added
 		try {
-			
+			System.out.println("Enter transaction password");
+
+			tranPwd = scanner.next();
+
+			transInput = checkTransactionPassword(tranPwd, accTransPwd);
+
+			while (transInput == 2) {
+				System.out.println("Enter transaction password");
+
+				tranPwd = scanner.next();
+
+				transInput = checkTransactionPassword(tranPwd, accTransPwd);
+
+			}
+			if(transInput==1) {
 			if (temp.equals(AccountType.FIXED_DEPOSIT)) {
 				
 				creditAccountBean = accountService.closeAccount(closingAccountBean.getAccNo(),
@@ -981,7 +1026,7 @@ public class AccountUi {
 				System.out.println("The RD account is closed. Balance has been credited to Account: "
 						+ printAccountNumber(creditAccountBean.getAccNo()) + ", Updated Balance of Saving Account: "
 						+ creditAccountBean.getBalance().setScale(2, RoundingMode.HALF_UP));
-			}
+			}}
 		} catch (Exception excp) {
 			System.out.println(excp.getMessage());
 			//excp.printStackTrace();
